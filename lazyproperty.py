@@ -14,7 +14,7 @@ class lazyproperty:
             return self
         if hasattr(instance, self.cache):
             return getattr(instance, self.cache)
-        res = self.func()
+        res = self.func(instance)
         setattr(instance, self.cache, res)
         return res
 
@@ -36,8 +36,8 @@ class Circle:
 
 if __name__ == "__main__":
     c = Circle(12.3)
-    print(c.vars())
+    print(vars(c))
     print(c.area)
-    print(c.vars())
+    print(vars(c))
     print(c.circumference)
     print(c.area)
