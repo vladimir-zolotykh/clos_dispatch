@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
 import math
+from types import MethodType
 
 
 class lazyproperty:
@@ -14,7 +15,7 @@ class lazyproperty:
             return self
         if hasattr(instance, self.cache):
             return getattr(instance, self.cache)
-        res = self.func(instance)
+        res = MethodType(self.func, instance)()
         setattr(instance, self.cache, res)
         return res
 
@@ -36,8 +37,7 @@ class Circle:
 
 if __name__ == "__main__":
     c = Circle(12.3)
-    print(vars(c))
     print(c.area)
-    print(vars(c))
     print(c.circumference)
+    print(vars(c))
     print(c.area)
