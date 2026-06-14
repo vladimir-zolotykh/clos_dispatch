@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
+from typing import ClassVar
 from operator import itemgetter
 
 
@@ -12,9 +13,11 @@ class TupleMeta(type):
 
 
 class MyTuple(tuple, metaclass=TupleMeta):
+    _fields: ClassVar[list[str]]
+
     def __new__(cls, *args):
         if len(args) != (n := len(cls._fields)):
-            raise TypeError(f"{cls} gets {len(n)} args")
+            raise TypeError(f"{cls} gets {n} args")
         return super().__new__(cls, args)
 
 
