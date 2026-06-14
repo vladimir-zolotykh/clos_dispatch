@@ -22,6 +22,11 @@ class Person(MyTuple):
     _fields = ["name", "age", "salary"]
 
 
+def as_csv(tup: MyTuple) -> str:
+    return ", ".join(f"{n}={getattr(tup, n)!r}" for n in tup._fields)
+
+
 if __name__ == "__main__":
     bob = Person("Bob", 37, 12000)
     print(bob)
+    print(as_csv(bob))
