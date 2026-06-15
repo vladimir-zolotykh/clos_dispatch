@@ -9,9 +9,9 @@ class CachedMeta(type):
 
     def __call__(cls, *args, **kwds):
         key = tuple(args)
-        if cls not in type(cls)._cache or key not in type(cls)._cache[cls]:
-            type(cls)._cache[cls][key] = super().__call__(*args, **kwds)
-        return type(cls)._cache[cls][key]
+        if cls not in (ca := type(cls)._cache) or key not in ca[cls]:
+            ca[cls][key] = super().__call__(*args, **kwds)
+        return ca[cls][key]
 
 
 class Person(metaclass=CachedMeta):
