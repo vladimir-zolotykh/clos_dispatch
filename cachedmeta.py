@@ -25,8 +25,20 @@ class Person(metaclass=CachedMeta):
         print(f"Initializing Person({self.name}, {self.age}, {self.salary}")
 
 
-if __name__ == "__main__":
+def test_person(capsys):
     bob = Person("Bob", 37, 12000)
     print(bob)
+    out = capsys.readouterr().out
+    assert out.count("Initializing Person(Bob, 37, 12000") == 1
+    assert "Initializing Person(Bob, 37, 12000" in out
     Person("Bob", 38, 12000)
     Person("Bob", 38, 12000)
+    out = capsys.readouterr().out
+    assert out.count("Initializing Person(Bob, 38, 12000") == 1
+
+
+if __name__ == "__main__":
+    import sys
+    import pytest
+
+    pytest.main(sys.argv)
