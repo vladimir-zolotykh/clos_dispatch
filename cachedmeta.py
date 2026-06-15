@@ -21,6 +21,9 @@ class Person(metaclass=CachedMeta):
         self.age = age
         self.salary = salary
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.name!r}, {self.age}, {self.salary})"
+
 
 if __name__ == "__main__":
     bob = Person("Bob", 37, 12000)
