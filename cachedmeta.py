@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
 from collections import defaultdict
+from dataclasses import dataclass
 
 
 class CachedMeta(type):
@@ -14,15 +15,14 @@ class CachedMeta(type):
         return ca[cls][key]
 
 
+@dataclass
 class Person(metaclass=CachedMeta):
-    def __init__(self, name, age, salary):
-        print(f"Initializing Person({name}, {age}, {salary}")
-        self.name = name
-        self.age = age
-        self.salary = salary
+    name: str
+    age: int
+    salary: float
 
-    def __repr__(self):
-        return f"{self.__class__.__name__}({self.name!r}, {self.age}, {self.salary})"
+    def __post_init__(self):
+        print(f"Initializing Person({self.name}, {self.age}, {self.salary}")
 
 
 if __name__ == "__main__":
