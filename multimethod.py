@@ -3,7 +3,6 @@
 # PYTHON_ARGCOMPLETE_OK
 # flake8: noqa: F811
 # mypy: disable-error-code="no-redef"
-from __future__ import annotations
 import types
 from typing import Callable, MutableMapping, Any
 import inspect
@@ -22,7 +21,7 @@ class MultiMethod:
             parm.annotation for parm in sig.parameters.values()
         )[1:]
         self.dir[stamp] = func
-        n = sum(parm.default is inspect._empty for parm in sig.parameters.values())
+        n = sum(parm.default is not inspect._empty for parm in sig.parameters.values())
         if 0 < n:
             self.dir[stamp[:-n]] = func
 
