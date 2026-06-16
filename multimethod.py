@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
-# flake8: noqa: F811
-# mypy: disable-error-code="no-redef"
 import types
 from typing import Callable, MutableMapping, Any
 import inspect
+import time
+import datetime
 
 Stamp = tuple[type, ...]
 
@@ -68,13 +68,33 @@ class HasAdd(metaclass=MultiMeta):
         print(f"add-int-int {x} {y}")
         return x + y
 
-    def add(self, x: str, y: str) -> str:
+    def add(self, x: str, y: str) -> str:  # noqa: F811
         print(f"add-str-str {x} {y}")
         return f"{x}__{y}"
 
-    def add(self, x: float, y: float = 2.3) -> float:
+    def add(self, x: float, y: float = 2.3) -> float:  # noqa: F811
         print(f"add-float-float {x} {y}")
         return x + y
+
+
+class Date(metaclass=MultiMeta):
+    """
+    >>> d = Date(2012, 12, 21)
+    >>> d.year, d.month, d.day
+    (2012, 12, 21)
+    >>> e = Date()
+    >>> e.year, e.month, e.day
+    (2026, 6, 16)
+    """
+
+    def __init__(self, year: int, month: int, day: int):
+        self.year = year
+        self.month = month
+        self.day = day
+
+    def __init__(self):  # noqa: F811
+        t = time.localtime()
+        self.__init__(t.tm_year, t.tm_mon, t.tm_mday)
 
 
 class _TestHasAdd:
