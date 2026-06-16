@@ -5,7 +5,7 @@ import types
 from typing import Callable, MutableMapping, Any
 import inspect
 import time
-import datetime
+from functools import wraps
 
 Stamp = tuple[type, ...]
 
@@ -63,17 +63,33 @@ class MultiMeta(type):
         return MultiDict()
 
 
+def inscribed(func):
+    sig = inspect.signature(func)
+    types_ = "-".join(
+        p.annotation.__name__ for k, p in sig.parameters.items() if k != "self"
+    )
+
+    @wraps(func)
+    def wrapper(*args, **kwds):
+        values = " ".join(str(a) for a in args[1:])
+        print(f"{func.__name__}-{types_} {values}")
+        res = func(*args, **kwds)
+        return res
+
+    return wrapper
+
+
 class HasAdd(metaclass=MultiMeta):
+    @inscribed
     def add(self, x: int, y: int) -> int:
-        print(f"add-int-int {x} {y}")
         return x + y
 
+    @inscribed
     def add(self, x: str, y: str) -> str:  # noqa: F811
-        print(f"add-str-str {x} {y}")
         return f"{x}__{y}"
 
+    @inscribed
     def add(self, x: float, y: float = 2.3) -> float:  # noqa: F811
-        print(f"add-float-float {x} {y}")
         return x + y
 
 
@@ -120,6 +136,13 @@ class _TestHasAdd:
 
 
 if __name__ == "__main__":
-    import doctest
+    ha = HasAdd()
+    ha.add(1, 2)
+    ha.add("a", "b")  # type: ignore
+    ha.add(1.2, 3.4)  # type: ignore
+    ha.add(1.2)  # type: ignore
 
-    doctest.testmod()
+# if __name__ == "__main__":
+#     import doctest
+
+#     doctest.testmod()
