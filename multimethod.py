@@ -33,7 +33,10 @@ class MultiMethod:
 
     def __call__(self, *args, **kwds):
         stamp = tuple(type(a) for a in args[1:])
-        return self.dir[stamp](*args, **kwds)
+        try:
+            return self.dir[stamp](*args, **kwds)
+        except KeyError as exc:
+            raise TypeError(f"No method for {stamp}") from exc
 
 
 class MultiDict(dict):
@@ -74,9 +77,29 @@ class HasAdd(metaclass=MultiMeta):
         return x + y
 
 
+class _TestHasAdd:
+    """
+    >>> ha = HasAdd()
+    >>> ha.add(1, 2)
+    add-int-int 1 2
+    3
+    >>> ha.add("a", "b")
+    add-str-str a b
+    'a__b'
+    >>> ha.add(1.2, 3.4)
+    add-float-float 1.2 3.4
+    4.6
+    >>> ha.add(1.2)
+    add-float-float 1.2 2.3
+    3.5
+    >>> ha.add("a", 5)
+    Traceback (most recent call last):
+    ...
+    TypeError: No method for (<class 'str'>, <class 'int'>)
+    """
+
+
 if __name__ == "__main__":
-    ha = HasAdd()
-    ha.add(1, 2)
-    ha.add("a", "b")  # type: ignore
-    ha.add(1.2, 3.4)  # type: ignore
-    ha.add(1.2)  # type: ignore
+    import doctest
+
+    doctest.testmod()
