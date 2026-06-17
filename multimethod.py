@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
 import types
-from typing import Callable, MutableMapping, Any
+from typing import Callable, MutableMapping, Any, get_type_hints
 import inspect
 import time
 from functools import wraps
@@ -28,10 +28,16 @@ class MultiMethod:
     def __call__(self, *args, **kwargs):
         last_exc = None
         for func in self.methods:
+            sig = inspect.signature(func)
+            hints = get_type_hints(func)
             try:
-                sig = inspect.signature(func)
                 ba = sig.bind(*args, **kwargs)
                 ba.apply_defaults()
+                for name, value in ba.arguments.items():
+                    if name in hints:
+                        expected = hints[name]
+                        if not isinstance(value, expected):
+                            raise TypeError(f"{name!r} does not match {expected}")
                 return func(*ba.args, **ba.kwargs)
             except TypeError as exc:
                 last_exc = exc
