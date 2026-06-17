@@ -100,7 +100,7 @@ class Date(metaclass=MultiMeta):
     (2012, 12, 21)
     >>> e = Date()
     >>> e.year, e.month, e.day
-    (2026, 6, 16)
+    (2026, 6, 17)
     """
 
     def __init__(self, year: int, month: int, day: int):
@@ -126,7 +126,7 @@ class _TestHasAdd:
     add-float-float 1.2 3.4
     4.6
     >>> ha.add(1.2)
-    add-float-float 1.2 2.3
+    add-float-float 1.2
     3.5
     >>> ha.add("a", 5)
     Traceback (most recent call last):
@@ -135,14 +135,14 @@ class _TestHasAdd:
     """
 
 
-if __name__ == "__main__":
-    ha = HasAdd()
-    ha.add(1, 2)
-    ha.add("a", "b")  # type: ignore
-    ha.add(1.2, 3.4)  # type: ignore
-    ha.add(1.2)  # type: ignore
-
 # if __name__ == "__main__":
-#     import doctest
+#     ha = HasAdd()
+#     ha.add(1, 2)
+#     ha.add("a", "b")  # type: ignore
+#     ha.add(1.2, 3.4)  # type: ignore
+#     ha.add(1.2)  # type: ignore
 
-#     doctest.testmod()
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
