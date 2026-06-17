@@ -41,7 +41,9 @@ class MultiMethod:
                 return func(*ba.args, **ba.kwargs)
             except TypeError as exc:
                 last_exc = exc
-        raise TypeError(f"No method for {args}, {kwargs}") from last_exc
+        raise TypeError(
+            f"No method for {tuple(type(a) for a in args[1:])}"
+        ) from last_exc
 
 
 class MultiDict(dict):
@@ -131,7 +133,7 @@ class _TestHasAdd:
     add-float-float 1.2 3.4
     4.6
     >>> ha.add(1.2)
-    add-float-float 1.2
+    add-float-float 1.2 2.3
     3.5
     >>> ha.add("a", 5)
     Traceback (most recent call last):
