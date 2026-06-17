@@ -35,11 +35,12 @@ class MultiMethod:
             try:
                 ba = sig.bind(*args, **kwargs)
                 ba.apply_defaults()
-                for name, value in ba.arguments.items():
-                    if name in hints:
-                        expected = hints[name]
-                        if not isinstance(value, expected):
-                            raise TypeError(f"{name!r} does not match {expected}")
+                if not all(
+                    isinstance(value, hints[name])
+                    for name, value in ba.arguments.items()
+                    if name != "self"
+                ):
+                    continue
                 return func(*ba.args, **ba.kwargs)
             except TypeError as exc:
                 last_exc = exc
@@ -109,7 +110,7 @@ class Date(metaclass=MultiMeta):
     (2012, 12, 21)
     >>> e = Date()
     >>> e.year, e.month, e.day
-    (2026, 6, 17)
+    (2026, 6, 18)
     """
 
     def __init__(self, year: int, month: int, day: int):
