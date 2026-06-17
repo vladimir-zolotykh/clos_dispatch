@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
+# mypy: disable-error-code="no-redef"
 import types
 from typing import Callable, MutableMapping, Any, get_type_hints
 import inspect
@@ -29,6 +30,7 @@ class MultiMethod:
         last_exc = None
         for func in self.methods:
             sig = inspect.signature(func)
+            # {'x': <class 'int'>, 'y': <class 'int'>, ...}
             hints = get_type_hints(func)
             try:
                 ba = sig.bind(*args, **kwargs)
@@ -54,7 +56,7 @@ class MultiDict(dict):
                 mm: MultiMethod = oval
                 mm.register(val)
             else:
-                mm: MultiMethod = MultiMethod(key)
+                mm = MultiMethod(key)
                 mm.register(oval)
                 mm.register(val)
             super().__setitem__(key, mm)
