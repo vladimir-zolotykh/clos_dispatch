@@ -13,17 +13,11 @@ Stamp = tuple[type, ...]
 class MultiMethod:
     def __init__(self, name: str):
         self._name = name  # method name
-        self.dir: dict[tuple[type, ...], Callable] = {}  # registered methods
+        self.methods: list[Callable] = []
+        # self.dir: dict[tuple[type, ...], Callable] = {}  # registered methods
 
     def register(self, func: Callable) -> None:
-        sig = inspect.signature(func)
-        stamp: tuple[type, ...] = tuple(
-            parm.annotation for parm in sig.parameters.values()
-        )[1:]
-        self.dir[stamp] = func
-        n = sum(parm.default is not inspect._empty for parm in sig.parameters.values())
-        if 0 < n:
-            self.dir[stamp[:-n]] = func
+        self.methods.append(func)
 
     def __get__(self, instance: object, owner: object = None) -> Callable:
         if instance is None:
@@ -31,12 +25,17 @@ class MultiMethod:
         # return types.MethodType(self, self)
         return types.MethodType(self, instance)
 
-    def __call__(self, *args, **kwds):
-        stamp = tuple(type(a) for a in args[1:])
-        try:
-            return self.dir[stamp](*args, **kwds)
-        except KeyError as exc:
-            raise TypeError(f"No method for {stamp}") from exc
+    def __call__(self, *args, **kwargs):
+        last_exc = None
+        for func in self.methods:
+            try:
+                sig = inspect.signature(func)
+                ba = sig.bind(*args, **kwargs)
+                ba.apply_defaults()
+                return func(*ba.args, **ba.kwargs)
+            except TypeError as exc:
+                last_exc = exc
+        raise TypeError(f"No method for {args}, {kwargs}") from last_exc
 
 
 class MultiDict(dict):
