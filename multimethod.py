@@ -4,18 +4,28 @@
 # mypy: disable-error-code="no-redef"
 import types
 from typing import Callable, MutableMapping, Any, get_type_hints
+from dataclasses import dataclass
 import inspect
 import time
 from functools import wraps
 
-Stamp = tuple[type, ...]
+
+@dataclass
+class _Method:
+    func: Callable
+    sig: inspect.Signature
+    hints: dict[str, type]
+
+    def __iter__(self):
+        yield self.func
+        yield self.sig
+        yield self.hints
 
 
 class MultiMethod:
     def __init__(self, name: str):
         self._name = name  # method name
-        self.methods: list[Callable] = []
-        # self.dir: dict[tuple[type, ...], Callable] = {}  # registered methods
+        self.methods: list[_Method] = []
 
     def register(self, func: Callable) -> None:
         sig = inspect.signature(func)
@@ -23,7 +33,9 @@ class MultiMethod:
             if name != "self" and parm.annotation is inspect._empty:
                 raise TypeError(f"{func.__name__} all parameters must be annotated")
 
-        self.methods.append(func)
+        self.methods.append(
+            _Method(func, inspect.signature(func), get_type_hints(func))
+        )
 
     def __get__(self, instance: object, owner: object = None) -> Callable:
         if instance is None:
@@ -33,10 +45,7 @@ class MultiMethod:
 
     def __call__(self, *args, **kwargs):
         last_exc = None
-        for func in self.methods:
-            sig = inspect.signature(func)
-            # {'x': <class 'int'>, 'y': <class 'int'>, ...}
-            hints = get_type_hints(func)
+        for func, sig, hints in self.methods:
             try:
                 ba = sig.bind(*args, **kwargs)
                 ba.apply_defaults()
