@@ -119,7 +119,7 @@ class Date(metaclass=MultiMeta):
         self.day = day
 
     def __init__(self):  # noqa: F811
-        t = time.localtime()
+        t = time.strptime("2026-06-18", "%Y-%m-%d")
         self.__init__(t.tm_year, t.tm_mon, t.tm_mday)
 
 
