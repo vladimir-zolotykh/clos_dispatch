@@ -18,6 +18,11 @@ class MultiMethod:
         # self.dir: dict[tuple[type, ...], Callable] = {}  # registered methods
 
     def register(self, func: Callable) -> None:
+        sig = inspect.signature(func)
+        for name, parm in sig.parameters.items():
+            if name != "self" and parm.annotation is inspect._empty:
+                raise TypeError(f"{func.__name__} all parameters must be annotated")
+
         self.methods.append(func)
 
     def __get__(self, instance: object, owner: object = None) -> Callable:
