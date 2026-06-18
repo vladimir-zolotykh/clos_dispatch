@@ -17,9 +17,7 @@ class _Method:
     hints: dict[str, type]
 
     def __iter__(self):
-        yield self.func
-        yield self.sig
-        yield self.hints
+        yield from self.__dict__.values()
 
 
 class MultiMethod:
