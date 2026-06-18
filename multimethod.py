@@ -47,13 +47,14 @@ class MultiMethod:
             try:
                 ba = sig.bind(*args, **kwargs)
                 ba.apply_defaults()
-                if not all(
-                    isinstance(value, hints[name])
+                if all(
+                    (name in hints and isinstance(value, hints[name]))
                     for name, value in ba.arguments.items()
                     if name != "self"
                 ):
-                    continue
-                return func(*ba.args, **ba.kwargs)
+                    return func(*ba.args, **ba.kwargs)
+                else:
+                    continue  # the method `func' doesn't match
             except TypeError as exc:
                 last_exc = exc
         raise TypeError(
